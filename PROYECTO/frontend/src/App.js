@@ -9,6 +9,7 @@ import axios from 'axios'
 
 import Navbar from './components/Navegacion';
 import Productos from './components/Productos';
+import Compras from './components/Compras';
 
 import io from 'socket.io-client';
 const socket = io.connect('http://localhost:4000');
@@ -24,6 +25,9 @@ function App() {
           <Switch>
             <Route exact path='/productos' 
               component={() => <Productos axios={axios} socket={socket}></Productos>}></Route>
+            
+            <Route exact path='/compras' 
+              component={() => <Compras axios={axios} socket={socket}></Compras>}></Route>
           </Switch>
       </Router>
     </div>

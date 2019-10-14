@@ -18,7 +18,7 @@ export default class Navegacion extends Component {
                         <NavLink className="nav-link" to="/productos">Productos</NavLink>
                     </li>
                     <li className="nav-item">
-                        <NavLink className="nav-link" to="#">Compras</NavLink>
+                        <NavLink className="nav-link" to="/compras">Compras</NavLink>
                     </li>
                     <li className="nav-item">
                         <NavLink className="nav-link disabled" to="#" tabindex="-1" aria-disabled="true">Disabled</NavLink>

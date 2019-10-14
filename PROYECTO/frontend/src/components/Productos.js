@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import 'material-icons/css/material-icons.min.css';
 import {NotificationContainer, NotificationManager} from 'react-notifications'
 export default class Productos extends Component {
     constructor(props){
