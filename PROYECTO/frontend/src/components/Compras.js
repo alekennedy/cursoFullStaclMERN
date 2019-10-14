@@ -6,16 +6,22 @@ export default class Compras extends Component {
         super(props);
         this.state = {
             productos: [],
+            compras: [],
             cantidad: '',
             _id: '',
             axios: this.props.axios,
             socket: this.props.socket,
-            showProcessCompra: false
+            showProcessCompra: false,
+            showCompras: true
         }
     }
 
     componentDidMount(){
-        this.fecthProductos();
+        this.fecthRecursos()
+    }
+
+    async fecthRecursos(){
+        await Promise.all([this.fecthProductos(), this.fecthCompras()]);
     }
 
     async fecthProductos(){
@@ -32,18 +38,39 @@ export default class Compras extends Component {
         }
     }
 
+    async fecthCompras(){
+        try {
+            await this.state.socket.emit('fetchCompras')
+            await this.state.socket.on('Compras',(data)=>{
+                console.log(data);
+                 this.setState({
+                    compras: data
+                 });
+            });
+         } catch (error) {
+             NotificationManager.error("No se pudo recuperar los datos", 'Error');
+             console.error(error);
+         }
+    }
+
     processCompra(id){
         this.setState({
             showProcessCompra: true,
+            showCompras: false,
             _id: id
         });
     }
 
     handleSubmit = async (e) => {
         e.preventDefault();
+        this.setState({
+            showProcessCompra: false,
+            showCompras: true,
+            _id: ''          
+        });
         const compra = {
             cantidad: this.state.cantidad,
-            producto: this.state._id
+            producto: this.state._id,            
         }
 
         try {
@@ -56,6 +83,7 @@ export default class Compras extends Component {
         } catch (error) {
             console.error(error)
         }
+        this.fecthRecursos();
     }
 
     handleChange = (e) => {
@@ -64,7 +92,7 @@ export default class Compras extends Component {
         })
     }
     render() {
-        const {showProcessCompra} = this.state
+        const {showProcessCompra, showCompras} = this.state
         const processCompra = (
             <div className="card">
                 <div className="card-body">
@@ -81,6 +109,40 @@ export default class Compras extends Component {
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        )
+
+        const dashboard = (
+            <div className="card">
+                <div className="card-body">
+                    <h5 className="card-title">Dashboar Compra</h5>
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Monto total</th>
+                                <th scope="col">Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                this.state.compras.map(compra => {
+                                    return(
+                                        <tr key={compra._id}>
+                                            <td>{compra.producto.nombre}</td>
+                                            <td>{compra.producto.precio}</td>
+                                            <td>{compra.cantidad}</td>
+                                            <td>{compra.monto}</td>
+                                            <td>{compra.fecha}</td>
+                                        </tr>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         )
@@ -106,6 +168,7 @@ export default class Compras extends Component {
                     </div> 
                     <div className="col-sm-7">
                         {showProcessCompra && processCompra}
+                        {showCompras && dashboard}
                     </div>
                 </div>
                 <NotificationContainer></NotificationContainer>               
