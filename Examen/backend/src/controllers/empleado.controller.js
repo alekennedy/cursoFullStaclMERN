@@ -1,5 +1,5 @@
 const EmpleadoModel = require('../models/Empleado');
-
+const moment = require('moment');
 module.exports = {
     async getEmpleado(req, res){
         try {
@@ -9,24 +9,24 @@ module.exports = {
             console.log(error);
             res.json({
                 success: false,
-                mensaje: 'No se pudo obje'
+                mensaje: 'No se pudo obtener el empleado'
             })
         }
     },
     async getEmpleados(req, res){
         try {
-            const empleados = await EmpleadoModel.find();
+            const empleados = await EmpleadoModel.find({activo: true});
             res.json(empleados);
         } catch (error) {
             console.log(error);
             res.json({
                 success: false,
-                mensaje: 'No se obtener la lista de productos'
+                mensaje: 'No se obtener la lista de empleados'
             })
         }
     },
     async crearEmpleado(req, res){
-        const {nombre, apellido, domicilio, telefono, cedula, salario, cargo, tipo,fecha} = req.body;
+        const {nombre, apellido, domicilio, telefono, cedula, salario, cargo, tipo} = req.body;
         
         if(!nombre){
             return res.json({
@@ -55,13 +55,13 @@ module.exports = {
                 message: 'El tipo de trabajador no puede estar vacio.'
             });
         }
-
+        const fecha = moment().format('L');
         const salario_dia = salario/30;
         const salario_hora = salario_dia/8;
         const activo = true;
         try {
             const newEmpleado = new EmpleadoModel({
-                nombre, apellido, domicilio, telefono, cedula, salario, cargo, tipo,fecha, salario_dia, salario_hora, activo
+                nombre, apellido, domicilio, telefono, cedula, salario, cargo, tipo, fecha, salario_dia, salario_hora, activo
             });
             await newEmpleado.save();
             res.json({
@@ -143,5 +143,18 @@ module.exports = {
                 mensaje: 'No se pudo excluir el registro'
             })
         }
-    }
+    },
+    async getEmpleadosJornaleros(req, res){
+        try {
+            const empleados = await EmpleadoModel.find({activo:true, tipo: 'J'});
+            res.json(empleados);
+        } catch (error) {
+            console.log(error);
+            res.json({
+                success: false,
+                mensaje: 'No se obtener la lista de jornaleros'
+            })
+        }
+    },
+    
 };
